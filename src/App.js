@@ -3,12 +3,15 @@ import { Authenticator, AmplifyTheme } from "aws-amplify-react";
 import { API, graphqlOperation, Auth, Hub } from "aws-amplify";
 import { getUser } from "./graphql/queries";
 import { registerUser } from "./graphql/mutations";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
+import createBrowserHistory from "history/createBrowserHistory";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import MarketPage from "./pages/MarketPage";
 import Navbar from "./components/Navbar";
 import "./App.css";
+
+export const history = createBrowserHistory();
 
 export const UserContext = React.createContext();
 
@@ -97,14 +100,17 @@ class App extends React.Component {
       <Authenticator theme={theme} />
     ) : (
       <UserContext.Provider value={{ user }}>
-        <Router>
+        <Router history={history}>
           <>
             {/* Navbar */}
             <Navbar user={user} handleSignout={this.handleSignout} />
             {/* Routes */}
             <div className="app-container">
               <Route exact path="/" component={HomePage} />
-              <Route path="/profile" component={ProfilePage} />
+              <Route
+                path="/profile"
+                component={() => <ProfilePage user={user} />}
+              />
               <Route
                 path="/markets/:marketId"
                 component={({ match }) => (
