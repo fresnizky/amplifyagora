@@ -49,6 +49,7 @@ const chargeHandler = async (req, res, next) => {
       req.charge = charge;
       req.shipped = shipped;
       req.description = description;
+      req.email = req.body.email;
       next();
     } else {
       res.status(500).json({ error: "Error charging card" });
@@ -58,8 +59,14 @@ const chargeHandler = async (req, res, next) => {
   }
 };
 
+const convertCentsToDollars = price => (price / 100).toFixed(2);
+
 const emailHandler = (req, res) => {
-  const { charge } = req;
+  const {
+    charge,
+    description,
+    email: { shipped, customerEmail, ownerEmail }
+  } = req;
   ses.sendEmail(
     {
       Source: config.adminEmail,
@@ -74,7 +81,32 @@ const emailHandler = (req, res) => {
         Body: {
           Html: {
             Charset: "UTF-8",
-            Data: "<h3>Order Processed</h3>"
+            Data: `
+              <h3>Order Processed</h3>
+              <p><span style="font-weight: bold">${description}</span> - $ ${convertCentsToDollars(
+              charge.amount
+            )}</p>
+              <p>Customer Email: <a href="mailto:${customerEmail}">${customerEmail}</a></p>
+              <p>Contact your seller: <a href="mailto:${ownerEmail}">${ownerEmail}</a></p>
+
+              ${
+                shipped
+                  ? `<h4>Mailing Address</h4>
+              <p>${charge.source.name}</p>
+              <p>${charge.source.address_line1}</p>
+              <p>${charge.source.address_city}, ${
+                      charge.source.address_state
+                    } ${charge.source.address_zip}</p>
+              `
+                  : "Emailed product"
+              }
+
+              <p style="font-style: italic; color: grey;">${
+                shipped
+                  ? "Your product will be shipped in 2-3 days"
+                  : "Check your verified email for your emailed product"
+              }
+            `
           }
         }
       }
