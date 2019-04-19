@@ -6,9 +6,6 @@ src/aws-exports.js
 .graphqlconfig.yml
 .amplifyrc
 
-# Amplify Lambda functions
-!amplify/backend/function
-
 # dependencies
 /node_modules
 /.pnp
