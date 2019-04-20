@@ -126,7 +126,11 @@ class App extends React.Component {
               <Route
                 path="/markets/:marketId"
                 component={({ match }) => (
-                  <MarketPage marketId={match.params.marketId} user={user} />
+                  <MarketPage
+                    marketId={match.params.marketId}
+                    user={user}
+                    userAttributes={userAttributes}
+                  />
                 )}
               />
             </div>
