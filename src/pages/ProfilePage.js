@@ -46,7 +46,7 @@ class ProfilePage extends React.Component {
         width: "150",
         render: row => {
           if (row.name === "Email") {
-            const emailVerified = this.props.user.attributes.email_verified;
+            const emailVerified = this.props.userAttributes.email_verified;
             return emailVerified ? (
               <Tag type="success">Verified</Tag>
             ) : (
@@ -80,9 +80,8 @@ class ProfilePage extends React.Component {
   };
 
   componentDidMount() {
-    console.log(this.props);
-    if (this.props.user) {
-      this.getUserOrders(this.props.user.attributes.sub);
+    if (this.props.userAttributes) {
+      this.getUserOrders(this.props.userAttributes.sub);
     }
   }
 
@@ -97,74 +96,78 @@ class ProfilePage extends React.Component {
 
   render() {
     const { orders, columns } = this.state;
-    const { user } = this.props;
+    const { user, userAttributes } = this.props;
 
     return (
-      <>
-        <Tabs activeName="1" className="profile-tabs">
-          <Tabs.Pane
-            name="1"
-            label={
-              <>
-                <Icon name="document" className="icon" /> Summary
-              </>
-            }
-          >
-            <h2 className="header">Profile Summary</h2>
-            <Table
-              columns={columns}
-              data={[
-                { name: "Your Id", value: user.attributes.sub },
-                { name: "Username", value: user.username },
-                { name: "Email", value: user.attributes.email },
-                { name: "Phone Number", value: user.attributes.phone_number },
-                { name: "Delete Profile", value: "Sorry to see you go" }
-              ]}
-              showHeader={false}
-              rowClassName={row =>
-                row.name === "Delete Profile" && "delete-profile"
+      userAttributes && (
+        <>
+          <Tabs activeName="1" className="profile-tabs">
+            <Tabs.Pane
+              name="1"
+              label={
+                <>
+                  <Icon name="document" className="icon" /> Summary
+                </>
               }
-            />
-          </Tabs.Pane>
+            >
+              <h2 className="header">Profile Summary</h2>
+              <Table
+                columns={columns}
+                data={[
+                  { name: "Your Id", value: userAttributes.sub },
+                  { name: "Username", value: user.username },
+                  { name: "Email", value: userAttributes.email },
+                  { name: "Phone Number", value: userAttributes.phone_number },
+                  { name: "Delete Profile", value: "Sorry to see you go" }
+                ]}
+                showHeader={false}
+                rowClassName={row =>
+                  row.name === "Delete Profile" && "delete-profile"
+                }
+              />
+            </Tabs.Pane>
 
-          <Tabs.Pane
-            name="2"
-            label={
-              <>
-                <Icon name="message" className="icon" /> Orders
-              </>
-            }
-          >
-            <h2 className="header">Order History</h2>
-            {orders.map(order => (
-              <div className="mb-1" key={order.id}>
-                <Card>
-                  <pre>
-                    <p>Order Id: {order.id}</p>
-                    <p>Product Description: {order.product.description}</p>
-                    <p>Price: ${convertCentsToDollars(order.product.price)}</p>
-                    <p>Purchased on: {order.createdAt}</p>
-                    {order.shippingAddress && (
-                      <>
-                        Shipping address
-                        <div className="ml-2">
-                          <p>{order.shippingAddress.address_line1}</p>
-                          <p>
-                            {order.shippingAddress.city},
-                            {order.shippingAddress.address_state}
-                            {order.shippingAddress.address_country}{" "}
-                            {order.shippingAddress.address_zip}
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </pre>
-                </Card>
-              </div>
-            ))}
-          </Tabs.Pane>
-        </Tabs>
-      </>
+            <Tabs.Pane
+              name="2"
+              label={
+                <>
+                  <Icon name="message" className="icon" /> Orders
+                </>
+              }
+            >
+              <h2 className="header">Order History</h2>
+              {orders.map(order => (
+                <div className="mb-1" key={order.id}>
+                  <Card>
+                    <pre>
+                      <p>Order Id: {order.id}</p>
+                      <p>Product Description: {order.product.description}</p>
+                      <p>
+                        Price: ${convertCentsToDollars(order.product.price)}
+                      </p>
+                      <p>Purchased on: {order.createdAt}</p>
+                      {order.shippingAddress && (
+                        <>
+                          Shipping address
+                          <div className="ml-2">
+                            <p>{order.shippingAddress.address_line1}</p>
+                            <p>
+                              {order.shippingAddress.city},
+                              {order.shippingAddress.address_state}
+                              {order.shippingAddress.address_country}{" "}
+                              {order.shippingAddress.address_zip}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </pre>
+                  </Card>
+                </div>
+              ))}
+            </Tabs.Pane>
+          </Tabs>
+        </>
+      )
     );
   }
 }
