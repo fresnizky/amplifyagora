@@ -75,7 +75,11 @@ class ProfilePage extends React.Component {
               );
             case "Delete Profile":
               return (
-                <Button type="danger" size="small">
+                <Button
+                  onClick={this.handleDeleteProfile}
+                  type="danger"
+                  size="small"
+                >
                   Delete
                 </Button>
               );
@@ -154,6 +158,31 @@ class ProfilePage extends React.Component {
         message: `${err.message || "Error updating email"}`
       });
     }
+  };
+
+  handleDeleteProfile = () => {
+    MessageBox.confirm(
+      "This will permanently delete your account. Continue?",
+      "Attention!",
+      {
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+        type: "warning"
+      }
+    )
+      .then(async () => {
+        try {
+          await this.props.user.deleteUser(() => window.location.reload());
+        } catch (err) {
+          console.error(err);
+        }
+      })
+      .catch(() => {
+        Message({
+          type: "info",
+          message: "Delete canceled"
+        });
+      });
   };
 
   render() {
